@@ -29,13 +29,21 @@ async function executeHinglishCode(code, context = globalContext) {
     if (m = line.match(/^banao\s+(\w+)\s*=\s*(.+)$/)) return context[m[1]] = await evalInContext(m[2], context);
 
     // Style Change
-    if (m = line.match(/^badlo\s+"(.+)"\s+([\w-]+)\s+"(.+)"$/)) { let el = document.getElementById(m[1]); if (el) el.style.setProperty(m[2], m[3]); return; }
+    if (m = line.match(/^badlo\s+"(.+)"\s+([\w-]+)\s+"(.+)"$/)) {
+      let el = document.getElementById(m[1]);
+      if (el) el.style.setProperty(m[2], m[3]);
+      return;
+    }
 
     // Text Change
-    if (m = line.match(/^badloText\s+"(.+)"\s+"(.+)"$/)) { let el = document.getElementById(m[1]); if (el) el.innerText = m[2]; return; }
+    if (m = line.match(/^badloText\s+"(.+)"\s+"(.+)"$/)) {
+      let el = document.getElementById(m[1]);
+      if (el) el.innerText = m[2];
+      return;
+    }
 
     // Direct/Delegated Event Binding (eventLaga)
-    if (m = line.match(/^eventLaga\s+(.+)\s+₹(@?)\s*"(.+)"\s*\{$/)) {
+    if (m = line.match(/^eventLaga\s+(.+)\s+₹(@?)\s*"?(.+?)"?\s*\{$/)) {
       let eventPart = m[1].trim(), delegated = m[2] === "@", targetId = m[3];
       let { block, nextIndex } = getBlock(i); i = nextIndex - 1;
 
@@ -112,7 +120,7 @@ async function executeHinglishCode(code, context = globalContext) {
     }
 
     // Function Call
-    if (m = line.match(/^(\w+)\((.*)\)$/) && functions[m[1]]) {
+    if ((m = line.match(/^(\w+)\((.*)\)$/)) && functions[m[1]]) {
       let fn = functions[m[1]], args = await Promise.all(m[2].split(",").map(a => evalInContext(a, context)));
       let ctx = { ...context }; fn.params.forEach((p, i) => ctx[p] = args[i]);
       await executeHinglishCode(fn.block, ctx);
