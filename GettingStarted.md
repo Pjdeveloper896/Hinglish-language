@@ -7,7 +7,7 @@ Hinglish is a custom programming language that lets you write JavaScript-like co
 Include the Hinglish interpreter using this CDN link:
 
 ```html
-<script src="https://pjdeveloper896.github.io/Hinglish-language/dist/hinglish.min.js"></script>
+<script src="https://pjdeveloper896.github.io/Hinglish-language/dist/hinglish.js"></script>
 ```
 
 Then include your Hinglish code in a script tag like this:
