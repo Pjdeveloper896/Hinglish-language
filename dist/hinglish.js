@@ -19,29 +19,30 @@ async function executeHinglishCode(code, context = globalContext) {
   async function runLine(line) {
     if (typeof line !== "string") return;
     line = line.trim(); if (line === "" || line === "}") return;
+
     let m;
 
-    // Print
+    // Output
     if (m = line.match(/^likho\s+(.+)$/)) return console.log(await evalInContext(m[1], context));
 
     // Variable
     if (m = line.match(/^banao\s+(\w+)\s*=\s*(.+)$/)) return context[m[1]] = await evalInContext(m[2], context);
 
-    // Style change
+    // Style Change
     if (m = line.match(/^badlo\s+"(.+)"\s+([\w-]+)\s+"(.+)"$/)) {
       let el = document.getElementById(m[1]);
       if (el) el.style.setProperty(m[2], m[3]);
       return;
     }
 
-    // Text change
+    // Text Change
     if (m = line.match(/^badloText\s+"(.+)"\s+"(.+)"$/)) {
       let el = document.getElementById(m[1]);
       if (el) el.innerText = m[2];
       return;
     }
 
-    // Event binding
+    // Event Binding (Direct & Delegated)
     if (m = line.match(/^eventLaga\s+(.+)\s+₹(@?)\s*"(.+)"\s*\{$/)) {
       let eventPart = m[1].trim(), delegated = m[2] === "@", targetId = m[3];
       let { block, nextIndex } = getBlock(i); i = nextIndex - 1;
@@ -82,7 +83,7 @@ async function executeHinglishCode(code, context = globalContext) {
       return;
     }
 
-    // Conditionals
+    // Conditional
     if (m = line.match(/^agar\s+\((.+)\)\s*\{$/)) {
       let cond = m[1], { block, nextIndex } = getBlock(i), elseBlock = null;
       let next = lines[nextIndex]?.trim();
@@ -97,7 +98,7 @@ async function executeHinglishCode(code, context = globalContext) {
       return;
     }
 
-    // Loops
+    // Loop
     if (m = line.match(/^loopKaro\s*\((.+);(.+);(.+)\)\s*\{$/)) {
       let { block, nextIndex } = getBlock(i); i = nextIndex - 1;
       await evalInContext(m[1], context);
@@ -108,7 +109,7 @@ async function executeHinglishCode(code, context = globalContext) {
       return;
     }
 
-    // Functions
+    // Function
     if (m = line.match(/^kaam\s+(\w+)\((.*)\)\s*\{$/)) {
       let { block, nextIndex } = getBlock(i);
       functions[m[1]] = { params: m[2].split(",").map(p => p.trim()), block };
@@ -116,15 +117,17 @@ async function executeHinglishCode(code, context = globalContext) {
       return;
     }
 
-    // Function call
+    // Function Call
     if ((m = line.match(/^(\w+)\((.*)\)$/)) && functions[m[1]]) {
-      let fn = functions[m[1]], args = await Promise.all(m[2].split(",").map(a => evalInContext(a, context)));
-      let ctx = { ...context }; fn.params.forEach((p, i) => ctx[p] = args[i]);
+      let fn = functions[m[1]];
+      let args = await Promise.all(m[2].split(",").map(a => evalInContext(a, context)));
+      let ctx = { ...context };
+      fn.params.forEach((p, i) => ctx[p] = args[i]);
       await executeHinglishCode(fn.block, ctx);
       return;
     }
 
-    // Classes
+    // Class
     if (m = line.match(/^class\s+(\w+)\s*\{$/)) {
       let { block, nextIndex } = getBlock(i); i = nextIndex - 1;
       classes[m[1]] = (...args) => {
@@ -135,7 +138,7 @@ async function executeHinglishCode(code, context = globalContext) {
       return;
     }
 
-    // Class instantiation
+    // New Instance
     if (m = line.match(/^banao\s+(\w+)\s*=\s*new\s+(\w+)\((.*)\)$/)) {
       let args = await Promise.all(m[3].split(",").map(a => evalInContext(a, context)));
       if (classes[m[2]]) context[m[1]] = classes[m[2]](...args);
@@ -144,22 +147,25 @@ async function executeHinglishCode(code, context = globalContext) {
 
     // Import
     if (m = line.match(/^import\s+"(.+)"$/)) {
-      let res = await fetch(m[1]), importedCode = await res.text();
+      let res = await fetch(m[1]);
+      let importedCode = await res.text();
       await executeHinglishCode(importedCode, context);
       return;
     }
 
-    // Fetch
+    // Fetch API
     if (m = line.match(/^fetchKaro\((.+)\)$/)) {
-      let url = await evalInContext(m[1], context), res = await fetch(url);
+      let url = await evalInContext(m[1], context);
+      let res = await fetch(url);
       return await res.json();
     }
 
-    // AI App Generation
+    // AI App
     if (m = line.match(/^banao\s+app\s+"(.+)"$/)) {
       return alert("AI app bana raha hai: " + m[1]);
     }
 
+    // Fallback
     try {
       await evalInContext(line, context);
     } catch (e) {
@@ -175,3 +181,12 @@ async function evalInContext(js, context) {
 }
 
 window.executeHinglishCode = executeHinglishCode;
+
+// Auto-run Hinglish script on page load
+window.addEventListener("DOMContentLoaded", () => {
+  const script = document.querySelector('script[type="text/hinglish"]');
+  if (script) {
+    const code = script.textContent;
+    executeHinglishCode(code);
+  }
+});
