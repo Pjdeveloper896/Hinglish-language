@@ -1,3 +1,4 @@
+
 const classes = {}, globalContext = {}, functions = {};
 
 async function executeHinglishCode(code, context = globalContext) {
@@ -30,20 +31,24 @@ async function executeHinglishCode(code, context = globalContext) {
 
     // Style Change
     if (m = line.match(/^badlo\s+"(.+)"\s+([\w-]+)\s+"(.+)"$/)) {
-      let el = document.getElementById(m[1]);
-      if (el) el.style.setProperty(m[2], m[3]);
+      document.addEventListener("DOMContentLoaded", () => {
+        let el = document.getElementById(m[1]);
+        if (el) el.style.setProperty(m[2], m[3]);
+      });
       return;
     }
 
     // Text Change
     if (m = line.match(/^badloText\s+"(.+)"\s+"(.+)"$/)) {
-      let el = document.getElementById(m[1]);
-      if (el) el.innerText = m[2];
+      document.addEventListener("DOMContentLoaded", () => {
+        let el = document.getElementById(m[1]);
+        if (el) el.innerText = m[2];
+      });
       return;
     }
 
-    // Event Binding (Direct & Delegated)
-    if (m = line.match(/^eventLaga\s+(.+)\s+₹(@?)\s*"(.+)"\s*\{$/)) {
+    // Direct/Delegated Event Binding (eventLaga)
+    if (m = line.match(/^eventLaga\s+(.+)\s+â‚¹(@?)\s*"(.+)"\s*\{$/)) {
       let eventPart = m[1].trim(), delegated = m[2] === "@", targetId = m[3];
       let { block, nextIndex } = getBlock(i); i = nextIndex - 1;
 
@@ -57,26 +62,30 @@ async function executeHinglishCode(code, context = globalContext) {
 
       if (delegated) {
         eventTypes.forEach(eventType => {
-          document.addEventListener(eventType, async e => {
-            if (e.target.id === targetId) {
-              try {
-                await executeHinglishCode([...block], { ...context, event: e });
-              } catch (err) {
-                console.error("Delegated event error:", err);
+          document.addEventListener("DOMContentLoaded", () => {
+            document.addEventListener(eventType, async e => {
+              if (e.target.id === targetId) {
+                try {
+                  await executeHinglishCode([...block], { ...context, event: e });
+                } catch (err) {
+                  console.error("Delegated event error:", err);
+                }
               }
-            }
+            });
           });
         });
       } else {
-        let el = document.getElementById(targetId);
-        if (!el) return;
         eventTypes.forEach(eventType => {
-          el.addEventListener(eventType, async e => {
-            try {
-              await executeHinglishCode([...block], { ...context, event: e });
-            } catch (err) {
-              console.error("EventLaga error:", err);
-            }
+          document.addEventListener("DOMContentLoaded", () => {
+            let el = document.getElementById(targetId);
+            if (!el) return;
+            el.addEventListener(eventType, async e => {
+              try {
+                await executeHinglishCode([...block], { ...context, event: e });
+              } catch (err) {
+                console.error("EventLaga error:", err);
+              }
+            });
           });
         });
       }
@@ -119,10 +128,8 @@ async function executeHinglishCode(code, context = globalContext) {
 
     // Function Call
     if ((m = line.match(/^(\w+)\((.*)\)$/)) && functions[m[1]]) {
-      let fn = functions[m[1]];
-      let args = await Promise.all(m[2].split(",").map(a => evalInContext(a, context)));
-      let ctx = { ...context };
-      fn.params.forEach((p, i) => ctx[p] = args[i]);
+      let fn = functions[m[1]], args = await Promise.all(m[2].split(",").map(a => evalInContext(a, context)));
+      let ctx = { ...context }; fn.params.forEach((p, i) => ctx[p] = args[i]);
       await executeHinglishCode(fn.block, ctx);
       return;
     }
@@ -131,8 +138,7 @@ async function executeHinglishCode(code, context = globalContext) {
     if (m = line.match(/^class\s+(\w+)\s*\{$/)) {
       let { block, nextIndex } = getBlock(i); i = nextIndex - 1;
       classes[m[1]] = (...args) => {
-        const inst = {};
-        executeHinglishCode(block, { ...context, this: inst, arguments: args });
+        const inst = {}; executeHinglishCode(block, { ...context, this: inst, arguments: args });
         return inst;
       };
       return;
@@ -147,30 +153,23 @@ async function executeHinglishCode(code, context = globalContext) {
 
     // Import
     if (m = line.match(/^import\s+"(.+)"$/)) {
-      let res = await fetch(m[1]);
-      let importedCode = await res.text();
+      let res = await fetch(m[1]), importedCode = await res.text();
       await executeHinglishCode(importedCode, context);
       return;
     }
 
-    // Fetch API
+    // Fetch
     if (m = line.match(/^fetchKaro\((.+)\)$/)) {
-      let url = await evalInContext(m[1], context);
-      let res = await fetch(url);
+      let url = await evalInContext(m[1], context), res = await fetch(url);
       return await res.json();
     }
 
-    // AI App
-    if (m = line.match(/^banao\s+app\s+"(.+)"$/)) {
-      return alert("AI app bana raha hai: " + m[1]);
-    }
+    // AI App Generation
+    if (m = line.match(/^banao\s+app\s+"(.+)"$/)) return alert("AI app bana raha hai: " + m[1]);
 
-    // Fallback
-    try {
-      await evalInContext(line, context);
-    } catch (e) {
-      console.error("Error evaluating line:", line, e);
-    }
+    // Fallback eval
+    try { await evalInContext(line, context); }
+    catch (e) { console.error("Error evaluating line:", line, e); }
   }
 
   while (i < lines.length) await runLine(lines[i++]);
@@ -181,12 +180,3 @@ async function evalInContext(js, context) {
 }
 
 window.executeHinglishCode = executeHinglishCode;
-
-// Auto-run Hinglish script on page load
-window.addEventListener("DOMContentLoaded", () => {
-  const script = document.querySelector('script[type="text/hinglish"]');
-  if (script) {
-    const code = script.textContent;
-    executeHinglishCode(code);
-  }
-});
