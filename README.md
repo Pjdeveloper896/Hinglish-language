@@ -1,133 +1,194 @@
-# Hinglish-language
-This is a new language created by me 
-to use this copy config.js and create new javascript file as Config.js and then then paste it.
-alse link this Config.js  with your html and add nes script tag with type attribute with text/hinglish.
-now you are ready to write this new language 
-Got it! Here's your updated `README.md` without the license section:
+# Hinglish Programming Language (Stable)
+
+Welcome to the official documentation for the **Hinglish Programming Language** – a beginner-friendly, Hindi-English hybrid language designed for intuitive coding.
+
+## CDN Link
+Include this in your HTML file:
+```html
+<script src="https://pjdeveloper896.github.io/Hinglish-language/hinglish.min.js"></script>
+```
 
 ---
 
-# Hinglish Programming Language (Browser Interpreter)
+## 1. Basic Setup
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hinglish App</title>
+  <script src="https://pjdeveloper896.github.io/Hinglish-language/hinglish.min.js"></script>
+</head>
+<body>
+  <button id="btn1">Click Me</button>
+  <script type="text/hinglish">
+    likho "Hinglish loaded!"
 
-**Hinglish** is a custom interpreted programming language that lets you write code using Hindi-English keywords. This browser-based interpreter allows execution of `.hl` scripts directly in the browser via `<script type="text/hinglish">`.
-
----
-
-## Features
-
-- Variables with `banao`
-- Print to console with `likho`
-- If-else statements with `agar` and `warna`
-- For loops with `loopKaro(init; condition; increment)`
-- Functions using `kaam` keyword
-- DOM text and style manipulation
-- Event handling with `jab`
-- Classes and object instantiation
-- Code import from other files
-- AI app command using `banao app`
-
----
-
-## Quick Example
-
-```hinglish
-banao naam = "Duniya"
-likho "Hello " + naam
-
-kaam bolaKaro(msg) {
-    likho msg
-}
-bolaKaro("Namaste!")
-
-class Aadmi {
-    this.naam = arguments[0]
-    this.swaagat = function() {
-        likho "Namaste " + this.naam
+    jabKaro "click" ₹ "btn1" {
+      likho "Button dabaya"
+      badloText "btn1" "Dubaara mat dabao"
     }
-}
-
-banao main = new Aadmi("Lakshmi")
-main.swaagat()
-
-agar (naam === "Duniya") {
-    likho "Yeh Duniya hai"
-} warna {
-    likho "Kuch aur hai"
-}
+  </script>
+</body>
+</html>
 ```
 
 ---
 
-## How to Use
-
-### 1. Include Script
-
-```html
-<script src="hinglish.js"></script>
-```
-
-### 2. Add Hinglish Code
-
-```html
-<script type="text/hinglish">
-    likho "Hinglish shuru ho gaya"
-</script>
-```
-
----
-
-## Language Syntax Reference
-
-| Hinglish Keyword | Description |
-|------------------|-------------|
-| `banao naam = value` | Create variable |
-| `likho expression` | Print to console |
-| `kaam naam(args) { ... }` | Define function |
-| `naam(args)` | Call function |
-| `loopKaro(init; condition; increment) { ... }` | For loop |
-| `agar (condition) { ... } warna { ... }` | If-Else |
-| `badloText "id" "text"` | Change element text |
-| `badlo "id" styleProperty "value"` | Change element style |
-| `jab "event" ₹ "id" { ... }` | Event listener |
-| `class ClassName { ... }` | Define class |
-| `banao obj = new ClassName(args)` | Instantiate object |
-| `import "path/to/code.hl"` | Import Hinglish file |
-| `banao app "idea"` | AI app trigger (placeholder) |
-
----
-
-## DOM Integration
-
-The interpreter allows direct DOM manipulation and event binding:
-
+## 2. Syntax Reference
 ```hinglish
-badloText "output" "Namaste Duniya"
-jab "click" ₹ "btn" {
-    likho "Button dabaya gaya!"
+likho "Hello world"
+banao naam = "Amit"
+badlo "btn1" background-color "red"
+badloText "btn1" "Naya text"
+```
+
+---
+
+## 3. Event Listeners
+### Direct:
+```hinglish
+jabKaro "click" ₹ "btn1" {
+  likho "Click hua"
+}
+```
+### Delegated:
+```hinglish
+jabKaro "click" ₹@"dynamicBtn" {
+  likho "Dynamic button dabaya"
 }
 ```
 
 ---
 
-## File Structure
-
-- `hinglish.js` - Main interpreter
-- `.hl` files - Optional separate Hinglish script files to import
-
----
-
-## Roadmap
-
-- [x] Variables, loops, functions, conditionals
-- [x] DOM and event support
-- [x] Classes and objects
-- [x] Module importing
-- [x] AI integration command (`banao app`)
-- [ ] Lambda functions & recursion
-- [ ] Arrays and objects
-- [ ] Async API calls
-- [ ] Full IDE support and debugging
+## 4. Conditional
+```hinglish
+agar (x > 5) {
+  likho "Bada hai"
+} warna {
+  likho "Chhota ya barabar hai"
+}
+```
 
 ---
 
+## 5. Loop
+```hinglish
+loopKaro(i = 0; i < 5; i++) {
+  likho i
+}
+```
 
+---
+
+## 6. Functions
+```hinglish
+kaam greet(naam) {
+  likho "Hello " + naam
+}
+
+greet("Amit")
+```
+
+---
+
+## 7. Classes and Objects
+```hinglish
+class Aadmi {
+  constructor() {
+    this.naam = "Hero"
+    likho "Ek aadmi bana"
+  }
+
+  kaam bol() {
+    likho this.naam + " bol raha hai"
+  }
+}
+
+banao insaan = new Aadmi()
+insaan.bol()
+```
+
+---
+
+## 8. Arrays and Objects
+```hinglish
+banao fruits = ["seb", "kela", "aam"]
+likho fruits[1]
+
+banao aadmi = {
+  naam: "Ravi",
+  umr: 25
+}
+
+likho aadmi.naam
+```
+
+---
+
+## 9. Import External Hinglish File
+```hinglish
+import "https://example.com/mera-code.hl"
+```
+
+---
+
+## 10. Fetch API with Async/Await
+```hinglish
+kaam loData() {
+  banao data = await fetchKaro("https://jsonplaceholder.typicode.com/todos/1")
+  likho data.title
+}
+
+loData()
+```
+
+---
+
+## 11. AI App Generation
+```hinglish
+banao app "todo list"
+```
+
+---
+
+## Deployment Tips
+- Wrap Hinglish code inside `<script type="text/hinglish">`.
+- Code runs automatically after `DOMContentLoaded`.
+- Interpreter supports full JS-like behavior: variables, classes, arrays, async/await, DOM, AI, and more.
+
+---
+
+## FAQ
+
+**Q: Do I need to run any JS manually?**  
+A: No, the Hinglish interpreter auto-executes your code after the DOM is ready.
+
+**Q: Can I use Hinglish with frameworks like React or Vue?**  
+A: Hinglish is best suited for vanilla HTML/JS projects.
+
+**Q: Can I contribute?**  
+A: Yes! Fork the repo and submit a PR with your improvements.
+
+---
+
+## Changelog
+
+**v1.0.0**  
+- Initial public release with full feature support
+- Stable CDN
+- AI app generation feature
+
+---
+
+## Troubleshooting
+
+**Problem:** Hinglish code doesn't run.  
+**Solution:** Ensure `<script src=".../hinglish.min.js">` is included and your Hinglish code is inside `<script type="text/hinglish">`.
+
+**Problem:** Import doesn't work.  
+**Solution:** Make sure the external `.hl` file has CORS headers and is publicly accessible.
+
+---
+
+**Made with love for developers who think in Hinglish.**
