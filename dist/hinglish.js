@@ -38,8 +38,9 @@ async function executeHinglishCode(code, context = globalContext) {
       return;
     }
 
-    if (m = line.match(/^eventLaga\s+(.+)\s+₹(@?)\s*"(.+)"\s*\{$/)) {
-      let eventPart = m[1].trim(), delegated = m[2] === "@", targetId = m[3];
+    // Event listener with . for event delegation
+    if (m = line.match(/^jabKaro\s+(.+)\s+\.\s*"(.+)"\s*\{$/)) {
+      let eventPart = m[1].trim(), targetClass = m[2];
       let { block, nextIndex } = getBlock(i); i = nextIndex - 1;
 
       let eventTypes = [];
@@ -51,34 +52,15 @@ async function executeHinglishCode(code, context = globalContext) {
       }
 
       eventTypes.forEach(eventType => {
-        if (delegated) {
-          document.addEventListener(eventType, async e => {
-            if (e.target.id === targetId) {
-              try {
-                await executeHinglishCode([...block], { ...context, event: e });
-              } catch (err) {
-                console.error("Delegated event error:", err);
-              }
+        document.addEventListener(eventType, async e => {
+          if (e.target.classList.contains(targetClass)) {
+            try {
+              await executeHinglishCode([...block], { ...context, event: e });
+            } catch (err) {
+              console.error("Event error:", err);
             }
-          });
-        } else {
-          const handler = async () => {
-            let el = document.getElementById(targetId);
-            if (!el) return;
-            el.addEventListener(eventType, async e => {
-              try {
-                await executeHinglishCode([...block], { ...context, event: e });
-              } catch (err) {
-                console.error("EventLaga error:", err);
-              }
-            });
-          };
-          if (document.readyState === "loading") {
-            document.addEventListener("DOMContentLoaded", handler);
-          } else {
-            handler();
           }
-        }
+        });
       });
       return;
     }
