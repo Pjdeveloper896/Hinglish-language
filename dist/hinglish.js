@@ -1,211 +1,130 @@
-// Tokenizer
-const TOKEN_TYPES = {
-    KEYWORD: "KEYWORD",
-    NUMBER: "NUMBER",
-    STRING: "STRING",
-    OPERATOR: "OPERATOR",
-    SYMBOL: "SYMBOL",
-    IDENTIFIER: "IDENTIFIER"
-};
+// Tokenizer - Breaks down Hinglish code into tokens
+function tokenize(code) {
+  const keywords = ['jabKaro', 'naya', 'kaam', 'agar', 'jab', 'har', 'banao'];
+  const operators = ['=', '==', '<', '>', '&&', '||'];
+  const symbols = ['(', ')', '{', '}', ';'];
+  const tokens = [];
+  let currentToken = '';
 
-const KEYWORDS = ["likho", "banao", "agar", "loopKaro", "kaam", "jabKaro", "badlo", "warna"];
+  for (let i = 0; i < code.length; i++) {
+    const char = code[i];
 
-function tokenize(input) {
-    const tokens = [];
-    const regex = /\s*(=>|\{|\}|\(|\)|"[^"]*"|\d+|\w+|==|!=|<=|>=|<|>|\+|\-|\*|\/|=|₹|#|,|\.)/g;
-    let match;
-    while ((match = regex.exec(input)) !== null) {
-        let [value] = match;
-        value = value.trim();
-        if (!value) continue;
-
-        if (KEYWORDS.includes(value)) tokens.push({ type: TOKEN_TYPES.KEYWORD, value });
-        else if (/^\d+$/.test(value)) tokens.push({ type: TOKEN_TYPES.NUMBER, value: Number(value) });
-        else if (/^".*"$/.test(value)) tokens.push({ type: TOKEN_TYPES.STRING, value: value.slice(1, -1) });
-        else if (["=", "+", "-", "*", "/", "==", "!=", "<", ">", "<=", ">=", "=>", ",", "."].includes(value)) tokens.push({ type: TOKEN_TYPES.OPERATOR, value });
-        else if (["{", "}", "(", ")", "₹", "#"].includes(value)) tokens.push({ type: TOKEN_TYPES.SYMBOL, value });
-        else tokens.push({ type: TOKEN_TYPES.IDENTIFIER, value });
+    if (char === ' ' || char === '\n') {
+      continue;
     }
-    return tokens;
+
+    if (symbols.includes(char)) {
+      if (currentToken) {
+        tokens.push({ type: 'IDENTIFIER', value: currentToken });
+        currentToken = '';
+      }
+      tokens.push({ type: 'SYMBOL', value: char });
+    } else if (operators.includes(char)) {
+      if (currentToken) {
+        tokens.push({ type: 'IDENTIFIER', value: currentToken });
+        currentToken = '';
+      }
+      tokens.push({ type: 'OPERATOR', value: char });
+    } else if (keywords.some(keyword => code.startsWith(keyword, i))) {
+      const matchedKeyword = keywords.find(keyword => code.startsWith(keyword, i));
+      if (currentToken) {
+        tokens.push({ type: 'IDENTIFIER', value: currentToken });
+        currentToken = '';
+      }
+      tokens.push({ type: 'KEYWORD', value: matchedKeyword });
+      i += matchedKeyword.length - 1; // Skip the length of the matched keyword
+    } else {
+      currentToken += char;
+    }
+  }
+
+  if (currentToken) {
+    tokens.push({ type: 'IDENTIFIER', value: currentToken });
+  }
+
+  return tokens;
 }
 
-// Parser
+// Parser - Converts tokens into an Abstract Syntax Tree (AST)
 function parse(tokens) {
-    let current = 0;
+  const ast = [];
+  let current = 0;
 
-    function eat(type, value) {
-        const token = tokens[current];
-        if (!token || token.type !== type || (value && token.value !== value)) {
-            throw new SyntaxError(`Expected ${value || type}, got ${token?.value}`);
-        }
-        current++;
-        return token;
+  while (current < tokens.length) {
+    const token = tokens[current];
+
+    if (token.type === 'KEYWORD' && token.value === 'naya') {
+      const variable = tokens[current + 1].value;
+      const value = tokens[current + 3].value; // Assuming simple assignments (variable = value)
+      ast.push({ type: 'VARIABLE_DECLARATION', variable, value });
+      current += 4;
     }
 
-    function parseStatement() {
-        let token = tokens[current];
-
-        if (token.type === TOKEN_TYPES.KEYWORD) {
-            switch (token.value) {
-                case "likho":
-                    current++;
-                    const expr = parseExpression();
-                    return { type: "PrintStatement", expression: expr };
-
-                case "banao":
-                    current++;
-                    const varName = eat(TOKEN_TYPES.IDENTIFIER).value;
-                    eat(TOKEN_TYPES.OPERATOR, "=");
-                    const value = parseExpression();
-                    return { type: "VariableDeclaration", name: varName, value };
-
-                case "agar":
-                    current++;
-                    eat(TOKEN_TYPES.SYMBOL, "(");
-                    const condition = parseExpression();
-                    eat(TOKEN_TYPES.SYMBOL, ")");
-                    eat(TOKEN_TYPES.SYMBOL, "{");
-                    const consequent = parseBlock();
-                    let alternate = null;
-                    if (tokens[current] && tokens[current].value === "warna") {
-                        current++;
-                        eat(TOKEN_TYPES.SYMBOL, "{");
-                        alternate = parseBlock();
-                    }
-                    return { type: "IfStatement", condition, consequent, alternate };
-
-                case "loopKaro":
-                    current++;
-                    eat(TOKEN_TYPES.SYMBOL, "(");
-                    const init = parseStatement();
-                    const conditionLoop = parseExpression();
-                    eat(TOKEN_TYPES.SYMBOL, ";");
-                    const after = parseExpression();
-                    eat(TOKEN_TYPES.SYMBOL, ")");
-                    eat(TOKEN_TYPES.SYMBOL, "{");
-                    const body = parseBlock();
-                    return { type: "LoopStatement", init, condition: conditionLoop, after, body };
-
-                case "kaam":
-                    current++;
-                    const fname = eat(TOKEN_TYPES.IDENTIFIER).value;
-                    eat(TOKEN_TYPES.SYMBOL, "(");
-                    const params = [];
-                    while (tokens[current].value !== ")") {
-                        params.push(eat(TOKEN_TYPES.IDENTIFIER).value);
-                        if (tokens[current].value === ",") current++;
-                    }
-                    eat(TOKEN_TYPES.SYMBOL, ")");
-                    eat(TOKEN_TYPES.SYMBOL, "{");
-                    const fnBody = parseBlock();
-                    return { type: "FunctionDeclaration", name: fname, params, body: fnBody };
-
-                case "jabKaro":
-                    current++;
-                    const eventType = eat(TOKEN_TYPES.STRING).value;
-                    eat(TOKEN_TYPES.KEYWORD, "in");
-                    const targetElement = eat(TOKEN_TYPES.STRING).value;
-                    eat(TOKEN_TYPES.KEYWORD, "{");
-                    const eventBody = parseBlock();
-                    return { 
-                        type: "EventListener", 
-                        eventType, 
-                        targetElement, 
-                        body: eventBody 
-                    };
-
-                case "badlo":
-                    current++;
-                    eat(TOKEN_TYPES.KEYWORD, "text");
-                    eat(TOKEN_TYPES.KEYWORD, "in");
-                    const elementID = eat(TOKEN_TYPES.STRING).value;
-                    eat(TOKEN_TYPES.KEYWORD, "{");
-                    const textToChange = parseExpression();
-                    eat(TOKEN_TYPES.SYMBOL, "}");
-                    return { type: "ChangeText", elementID, textToChange };
-            }
-        }
-
-        return parseExpression();
+    if (token.type === 'KEYWORD' && token.value === 'jabKaro') {
+      const eventType = tokens[current + 1].value;
+      const element = tokens[current + 3].value;
+      const callback = tokens[current + 5].value; // Simplified callback handling
+      ast.push({ type: 'EVENT_LISTENER', eventType, element, callback });
+      current += 6;
     }
 
-    function parseExpression() {
-        const token = tokens[current++];
-        if (!token) throw new SyntaxError("Unexpected end of input");
-        return { type: "Literal", value: token.value };
+    if (token.type === 'KEYWORD' && token.value === 'agar') {
+      const condition = tokens[current + 1].value;
+      const callback = tokens[current + 3].value;
+      ast.push({ type: 'CONDITIONAL', condition, callback });
+      current += 4;
     }
+    current++;
+  }
 
-    function parseBlock() {
-        const body = [];
-        while (tokens[current] && tokens[current].value !== "}") {
-            body.push(parseStatement());
-        }
-        eat(TOKEN_TYPES.SYMBOL, "}");
-        return body;
-    }
-
-    const body = [];
-    while (current < tokens.length) {
-        body.push(parseStatement());
-    }
-    return { type: "Program", body };
+  return ast;
 }
 
-// Interpreter
-async function evaluate(node, context = {}) {
+// Interpreter - Executes the AST
+function execute(ast) {
+  const context = {};
+
+  ast.forEach(node => {
     switch (node.type) {
-        case "Program":
-            for (let stmt of node.body) await evaluate(stmt, context);
-            break;
-        case "PrintStatement":
-            console.log(await evaluate(node.expression, context));
-            break;
-        case "VariableDeclaration":
-            context[node.name] = await evaluate(node.value, context);
-            break;
-        case "Literal":
-            return typeof node.value === "string" && context[node.value] !== undefined ? context[node.value] : node.value;
-        case "IfStatement":
-            if (await evaluate(node.condition, context)) await evaluate({ type: "Program", body: node.consequent }, context);
-            else if (node.alternate) await evaluate({ type: "Program", body: node.alternate }, context);
-            break;
-        case "LoopStatement":
-            await evaluate(node.init, context);
-            while (await evaluate(node.condition, context)) {
-                await evaluate({ type: "Program", body: node.body }, context);
-                await evaluate(node.after, context);
-            }
-            break;
-        case "FunctionDeclaration":
-            context[node.name] = async (...args) => {
-                const fnContext = { ...context };
-                node.params.forEach((p, i) => fnContext[p] = args[i]);
-                await evaluate({ type: "Program", body: node.body }, fnContext);
-            };
-            break;
-        case "EventListener": {
-            const eventName = await evaluate(node.eventType, context);
-            const targetId = await evaluate(node.targetElement, context);
-            const handler = async (e) => await evaluate({ type: "Program", body: node.body }, { ...context, event: e });
-            const el = document.getElementById(targetId);
-            if (el) el.addEventListener(eventName, handler);
-            break;
+      case 'VARIABLE_DECLARATION':
+        context[node.variable] = node.value;
+        break;
+      case 'EVENT_LISTENER':
+        const element = document.querySelector(node.element);
+        jabKaro(node.eventType, element, function() {
+          console.log(`${node.callback} triggered`);
+        });
+        break;
+      case 'CONDITIONAL':
+        if (context[node.condition]) {
+          console.log(node.callback);
         }
-        case "ChangeText": {
-            const element = document.getElementById(node.elementID);
-            if (element) {
-                element.textContent = await evaluate(node.textToChange, context);
-            }
-            break;
-        }
+        break;
     }
+  });
 }
 
-// Entry point for the CDN to run the code automatically
-async function runHinglish(code) {
-    const tokens = tokenize(code);
-    const ast = parse(tokens);
-    await evaluate(ast);
-}
+// CDNs and minified code for browser compatibility
+(function() {
+  const script = document.createElement('script');
+  script.src = "https://cdn.jsdelivr.net/gh/username/Hinglish-language@latest/hinglish.min.js";
+  document.head.appendChild(script);
+})();
 
-window.runHinglish = runHinglish;
+// Example Hinglish code
+const code = `
+naya x = 10;
+jabKaro 'click', '#myButton', 'alert("Hello Hinglish!")';
+agar x == 10, 'console.log("x is 10")';
+`;
+
+// Tokenize the Hinglish code
+const tokens = tokenize(code);
+console.log('Tokens:', tokens);
+
+// Parse tokens into AST
+const ast = parse(tokens);
+console.log('AST:', ast);
+
+// Execute the AST
+execute(ast);
