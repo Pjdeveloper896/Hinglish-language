@@ -11,7 +11,7 @@ const TOKEN_TYPES = {
 };
 
 // Hinglish keywords
-const KEYWORDS = ["likho", "agar", "warna", "loopKaro", "kaam", "wapis", "jabKaro", "banao"];
+const KEYWORDS = ["likho", "agar", "warna", "loopKaro", "kaam", "wapis", "jabKaro", "banao", "badlo"];
 
 // Tokenizer
 function tokenize(input) {
@@ -112,6 +112,16 @@ function parse(tokens) {
           eat(TOKEN_TYPES.SYMBOL, "{");
           const eBody = parseBlock();
           return { type: "EventListener", event, target, body: eBody, delegated: symbol.value === "₹" };
+
+        case "badlo":
+          current++;
+          eat(TOKEN_TYPES.KEYWORD, "text");
+          eat(TOKEN_TYPES.KEYWORD, "in");
+          const elementID = eat(TOKEN_TYPES.STRING).value;
+          eat(TOKEN_TYPES.KEYWORD, "{");
+          const textToChange = parseExpression();
+          eat(TOKEN_TYPES.SYMBOL, "}");
+          return { type: "ChangeText", elementID, textToChange };
       }
     }
 
@@ -181,6 +191,13 @@ async function evaluate(node, context = {}) {
       } else {
         const el = document.getElementById(targetId);
         if (el) el.addEventListener(eventName, handler);
+      }
+      break;
+    }
+    case "ChangeText": {
+      const element = document.getElementById(node.elementID);
+      if (element) {
+        element.textContent = await evaluate(node.textToChange, context);
       }
       break;
     }
