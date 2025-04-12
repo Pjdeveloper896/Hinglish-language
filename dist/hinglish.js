@@ -1,22 +1,7 @@
-// Hinglish Language - Tokenizer, Parser, Interpreter, Runtime
-
-// Token Types
-const TOKEN_TYPES = {
-  KEYWORD: "KEYWORD",
-  IDENTIFIER: "IDENTIFIER",
-  STRING: "STRING",
-  NUMBER: "NUMBER",
-  OPERATOR: "OPERATOR",
-  SYMBOL: "SYMBOL"
-};
-
-// Hinglish keywords
-const KEYWORDS = ["likho", "agar", "warna", "loopKaro", "kaam", "wapis", "jabKaro", "banao", "badlo"];
-
 // Tokenizer
 function tokenize(input) {
   const tokens = [];
-  const regex = /\s*(=>|\{|\}|\(|\)|"[^"]*"|\d+|\w+|==|!=|<=|>=|<|>|\+|\-|\*|\/|=|₹|#)/g;
+  const regex = /\s*(=>|\{|\}|\(|\)|"[^"]*"|\d+|\w+|==|!=|<=|>=|<|>|\+|\-|\*|\/|=|₹|#|,|\.)/g;
   let match;
   while ((match = regex.exec(input)) !== null) {
     let [value] = match;
@@ -26,14 +11,14 @@ function tokenize(input) {
     if (KEYWORDS.includes(value)) tokens.push({ type: TOKEN_TYPES.KEYWORD, value });
     else if (/^\d+$/.test(value)) tokens.push({ type: TOKEN_TYPES.NUMBER, value: Number(value) });
     else if (/^".*"$/.test(value)) tokens.push({ type: TOKEN_TYPES.STRING, value: value.slice(1, -1) });
-    else if (["=", "+", "-", "*", "/", "==", "!=", "<", ">", "<=", ">=", "=>"].includes(value)) tokens.push({ type: TOKEN_TYPES.OPERATOR, value });
+    else if (["=", "+", "-", "*", "/", "==", "!=", "<", ">", "<=", ">=", "=>", ",", "."].includes(value)) tokens.push({ type: TOKEN_TYPES.OPERATOR, value });
     else if (["{", "}", "(", ")", "₹", "#"].includes(value)) tokens.push({ type: TOKEN_TYPES.SYMBOL, value });
     else tokens.push({ type: TOKEN_TYPES.IDENTIFIER, value });
   }
   return tokens;
 }
 
-// Parser and AST Generator
+// Parser
 function parse(tokens) {
   let current = 0;
 
@@ -115,8 +100,7 @@ function parse(tokens) {
             type: "EventListener", 
             eventType, 
             targetElement, 
-            body: eventBody,
-            delegated: false  // Adjust if delegation logic needed
+            body: eventBody
           };
 
         case "badlo":
@@ -156,7 +140,7 @@ function parse(tokens) {
   return { type: "Program", body };
 }
 
-// Interpreter with runtime
+// Interpreter
 async function evaluate(node, context = {}) {
   switch (node.type) {
     case "Program":
@@ -214,14 +198,3 @@ async function runHinglish(code) {
 }
 
 window.runHinglish = runHinglish;
-
-// Auto run if script tag type="text/hinglish"
-window.addEventListener("load", () => {
-  document.querySelectorAll('script[type="text/hinglish"]').forEach(async script => {
-    try {
-      await runHinglish(script.textContent);
-    } catch (err) {
-      console.error("Hinglish Error:", err);
-    }
-  });
-});
