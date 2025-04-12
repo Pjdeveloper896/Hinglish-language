@@ -1,130 +1,66 @@
-// Tokenizer - Breaks down Hinglish code into tokens
-function tokenize(code) {
-  const keywords = ['jabKaro', 'naya', 'kaam', 'agar', 'jab', 'har', 'banao'];
-  const operators = ['=', '==', '<', '>', '&&', '||'];
-  const symbols = ['(', ')', '{', '}', ';'];
-  const tokens = [];
-  let currentToken = '';
-
-  for (let i = 0; i < code.length; i++) {
-    const char = code[i];
-
-    if (char === ' ' || char === '\n') {
-      continue;
+(function(global) {
+  const context = {
+    console,
+    document,
+    window,
+    fetch,
+    Math,
+    likho: (...args) => console.log(...args),
+    bolo: (...args) => {}, // parsed as var declarations
+    pakdo: (selector) => {
+      const el = document.querySelector(selector);
+      return {
+        textBadlo: (txt) => el && (el.textContent = txt),
+        rangBadlo: (rang) => el && (el.style.color = rang),
+        htmlBadlo: (html) => el && (el.innerHTML = html),
+        jabKaro: (event, callback) => el && el.addEventListener(event, callback),
+      };
     }
+  };
 
-    if (symbols.includes(char)) {
-      if (currentToken) {
-        tokens.push({ type: 'IDENTIFIER', value: currentToken });
-        currentToken = '';
-      }
-      tokens.push({ type: 'SYMBOL', value: char });
-    } else if (operators.includes(char)) {
-      if (currentToken) {
-        tokens.push({ type: 'IDENTIFIER', value: currentToken });
-        currentToken = '';
-      }
-      tokens.push({ type: 'OPERATOR', value: char });
-    } else if (keywords.some(keyword => code.startsWith(keyword, i))) {
-      const matchedKeyword = keywords.find(keyword => code.startsWith(keyword, i));
-      if (currentToken) {
-        tokens.push({ type: 'IDENTIFIER', value: currentToken });
-        currentToken = '';
-      }
-      tokens.push({ type: 'KEYWORD', value: matchedKeyword });
-      i += matchedKeyword.length - 1; // Skip the length of the matched keyword
-    } else {
-      currentToken += char;
+  function transpileHinglish(code) {
+    return code
+      .replace(/bolo\s+([a-zA-Z0-9_]+)\s*=\s*(.*)/g, "let $1 = $2")
+      .replace(/likho\s*\((.*?)\)/g, "context.likho($1)")
+      .replace(/pakdo\s*\((.*?)\)/g, `context.pakdo($1)`)
+      .replace(/jabKaro/g, "jabKaro") // used inside pakdo return
+      .replace(/rangBadlo/g, "rangBadlo")
+      .replace(/textBadlo/g, "textBadlo")
+      .replace(/htmlBadlo/g, "htmlBadlo")
+      .replace(/\bbanao function\s+([a-zA-Z0-9_]+)\s*\((.*?)\)/g, "function $1($2)")
+      .replace(/\bagar\s*\((.*?)\)/g, "if ($1)")
+      .replace(/\bnahiTo\s*\(/g, "else if (")
+      .replace(/\bnahiTo\b/g, "else")
+      .replace(/\bjabTak\s*\((.*?)\)/g, "while ($1)")
+      .replace(/\bkeLiye\s*\((.*?)\)/g, "for ($1)")
+      .replace(/\bbreak karo\b/g, "break")
+      .replace(/\bcontinue karo\b/g, "continue")
+      .replace(/\bwapas bhejo\s+(.*)/g, "return $1")
+      .replace(/\basync function\b/g, "async function")
+      .replace(/\bawait\b/g, "await")
+      .replace(/\bbanao class\s+([a-zA-Z0-9_]+)/g, "class $1")
+      .replace(/\bconstructor\b/g, "constructor")
+      .replace(/\bthis\b/g, "this")
+  }
+
+  async function runHinglish(code) {
+    const jsCode = transpileHinglish(code);
+    const asyncFn = new Function("context", `"use strict"; return (async () => { ${jsCode} })()`);
+
+    try {
+      await asyncFn(context);
+    } catch (err) {
+      console.error("Hinglish Error:", err.message);
     }
   }
 
-  if (currentToken) {
-    tokens.push({ type: 'IDENTIFIER', value: currentToken });
+  function initInterpreter() {
+    document.querySelectorAll('script[type="text/hinglish"]').forEach(async (script) => {
+      const code = script.innerText;
+      await runHinglish(code);
+    });
   }
 
-  return tokens;
-}
-
-// Parser - Converts tokens into an Abstract Syntax Tree (AST)
-function parse(tokens) {
-  const ast = [];
-  let current = 0;
-
-  while (current < tokens.length) {
-    const token = tokens[current];
-
-    if (token.type === 'KEYWORD' && token.value === 'naya') {
-      const variable = tokens[current + 1].value;
-      const value = tokens[current + 3].value; // Assuming simple assignments (variable = value)
-      ast.push({ type: 'VARIABLE_DECLARATION', variable, value });
-      current += 4;
-    }
-
-    if (token.type === 'KEYWORD' && token.value === 'jabKaro') {
-      const eventType = tokens[current + 1].value;
-      const element = tokens[current + 3].value;
-      const callback = tokens[current + 5].value; // Simplified callback handling
-      ast.push({ type: 'EVENT_LISTENER', eventType, element, callback });
-      current += 6;
-    }
-
-    if (token.type === 'KEYWORD' && token.value === 'agar') {
-      const condition = tokens[current + 1].value;
-      const callback = tokens[current + 3].value;
-      ast.push({ type: 'CONDITIONAL', condition, callback });
-      current += 4;
-    }
-    current++;
-  }
-
-  return ast;
-}
-
-// Interpreter - Executes the AST
-function execute(ast) {
-  const context = {};
-
-  ast.forEach(node => {
-    switch (node.type) {
-      case 'VARIABLE_DECLARATION':
-        context[node.variable] = node.value;
-        break;
-      case 'EVENT_LISTENER':
-        const element = document.querySelector(node.element);
-        jabKaro(node.eventType, element, function() {
-          console.log(`${node.callback} triggered`);
-        });
-        break;
-      case 'CONDITIONAL':
-        if (context[node.condition]) {
-          console.log(node.callback);
-        }
-        break;
-    }
-  });
-}
-
-// CDNs and minified code for browser compatibility
-(function() {
-  const script = document.createElement('script');
-  script.src = "https://cdn.jsdelivr.net/gh/username/Hinglish-language@latest/hinglish.min.js";
-  document.head.appendChild(script);
-})();
-
-// Example Hinglish code
-const code = `
-naya x = 10;
-jabKaro 'click', '#myButton', 'alert("Hello Hinglish!")';
-agar x == 10, 'console.log("x is 10")';
-`;
-
-// Tokenize the Hinglish code
-const tokens = tokenize(code);
-console.log('Tokens:', tokens);
-
-// Parse tokens into AST
-const ast = parse(tokens);
-console.log('AST:', ast);
-
-// Execute the AST
-execute(ast);
+  window.addEventListener("DOMContentLoaded", initInterpreter);
+  global.runHinglish = runHinglish;
+})(window);
