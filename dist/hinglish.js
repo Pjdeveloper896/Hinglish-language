@@ -38,29 +38,20 @@ async function executeHinglishCode(code, context = globalContext) {
       return;
     }
 
-    // Event listener with . for event delegation
-    if (m = line.match(/^jabKaro\s+(.+)\s+\.\s*"(.+)"\s*\{$/)) {
-      let eventPart = m[1].trim(), targetClass = m[2];
+    // Fixing the jabKaro event listener to use '#' instead of '.'
+    if (m = line.match(/^jabKaro\s+"(.+)"\s*#\s*"(.+)"\s*\{$/)) {
+      let eventType = m[1], targetId = m[2];
       let { block, nextIndex } = getBlock(i); i = nextIndex - 1;
 
-      let eventTypes = [];
-      try {
-        eventTypes = JSON.parse(eventPart);
-        if (!Array.isArray(eventTypes)) throw new Error("Not array");
-      } catch {
-        eventTypes = [eventPart.replace(/^"|"$/g, "")];
-      }
-
-      eventTypes.forEach(eventType => {
-        document.addEventListener(eventType, async e => {
-          if (e.target.classList.contains(targetClass)) {
-            try {
-              await executeHinglishCode([...block], { ...context, event: e });
-            } catch (err) {
-              console.error("Event error:", err);
-            }
+      // Add event listener with ID-based delegation
+      document.addEventListener(eventType, async (e) => {
+        if (e.target.id === targetId) {
+          try {
+            await executeHinglishCode(block, { ...context, event: e });
+          } catch (err) {
+            console.error("Event error:", err);
           }
-        });
+        }
       });
       return;
     }
