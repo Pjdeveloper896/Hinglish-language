@@ -106,12 +106,18 @@ function parse(tokens) {
 
         case "jabKaro":
           current++;
-          const event = parseExpression();
-          const symbol = eat(TOKEN_TYPES.SYMBOL);
-          const target = parseExpression();
-          eat(TOKEN_TYPES.SYMBOL, "{");
-          const eBody = parseBlock();
-          return { type: "EventListener", event, target, body: eBody, delegated: symbol.value === "₹" };
+          const eventType = eat(TOKEN_TYPES.STRING).value;  // Event type (like "click")
+          eat(TOKEN_TYPES.KEYWORD, "in");  // Ensure "in" keyword
+          const targetElement = eat(TOKEN_TYPES.STRING).value;  // Target element ID
+          eat(TOKEN_TYPES.KEYWORD, "{");  // Opening brace for event body
+          const eventBody = parseBlock();  // Event handler body
+          return { 
+            type: "EventListener", 
+            eventType, 
+            targetElement, 
+            body: eventBody,
+            delegated: false  // Adjust if delegation logic needed
+          };
 
         case "badlo":
           current++;
@@ -183,15 +189,11 @@ async function evaluate(node, context = {}) {
       };
       break;
     case "EventListener": {
-      const eventName = await evaluate(node.event, context);
-      const targetId = await evaluate(node.target, context);
+      const eventName = await evaluate(node.eventType, context);
+      const targetId = await evaluate(node.targetElement, context);
       const handler = async (e) => await evaluate({ type: "Program", body: node.body }, { ...context, event: e });
-      if (node.delegated) {
-        document.addEventListener(eventName, (e) => e.target.id === targetId && handler(e));
-      } else {
-        const el = document.getElementById(targetId);
-        if (el) el.addEventListener(eventName, handler);
-      }
+      const el = document.getElementById(targetId);
+      if (el) el.addEventListener(eventName, handler);
       break;
     }
     case "ChangeText": {
