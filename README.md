@@ -13,7 +13,7 @@ Welcome to Hinglish — the ultimate blend of Hindi and English, making programm
 
 Add Hinglish magic to your project with this simple script tag:
 
-```
+```html 
 <script src="https://pjdeveloper896.github.io/Hinglish-language/dist/hinglish.js"></script>
 ```
 
