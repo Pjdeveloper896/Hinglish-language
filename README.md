@@ -126,3 +126,141 @@ Let’s code like never before, with Hinglish! 🚀
 ---
 
 ```
+> Hinglish using cli
+
+
+---
+
+
+# Hinglish Programming Language (Python Interpreter via CDN)
+
+This is a simple CLI-based interpreter for the Hinglish Programming Language. You can run Hinglish code using a `.hl` file or interactively in the console — without downloading the interpreter manually!
+
+---
+
+## 🔗 Run via Python and GitHub CDN
+
+> ✅ Works on Android, Linux, Termux, Windows (with Python installed)
+
+### 📦 Requirements
+
+- Python 3
+- `requests` module
+
+Install `requests` if not installed:
+
+```bash
+pip install requests
+```
+
+---
+
+## 🚀 Quick Start (Console Mode)
+
+Create a file named `hinglish_cdn.py` with the following code:
+
+```python
+import sys
+import requests
+import subprocess
+import os
+
+# URL of the Hinglish interpreter hosted on GitHub Pages
+script_url = 'https://pjdeveloper896.github.io/Hinglish-language/dist/Hinglish.py'
+
+def download_script():
+    try:
+        response = requests.get(script_url)
+        response.raise_for_status()
+        return response.text
+    except requests.exceptions.RequestException as e:
+        print(f"Error downloading the script: {e}")
+        sys.exit(1)
+
+def execute_script(script_content):
+    try:
+        temp_file = 'Hinglish.py'
+        with open(temp_file, 'w') as file:
+            file.write(script_content)
+
+        subprocess.run(['python', temp_file, '--console'], check=True)
+        os.remove(temp_file)
+    except subprocess.CalledProcessError as e:
+        print(f"Error executing the script: {e}")
+        sys.exit(1)
+
+def main():
+    print("Downloading Hinglish Interpreter...")
+    script_content = download_script()
+    
+    print("Running Hinglish Interpreter...")
+    execute_script(script_content)
+
+if __name__ == '__main__':
+    main()
+```
+
+### 🧪 Run it!
+
+```bash
+python hinglish_cdn.py
+```
+
+---
+
+## 📂 Run Hinglish Code from File (`.hl`)
+
+Save your Hinglish code in a file, for example `example.hl`:
+
+```hl
+ghoom 3
+agar true
+meraNaam
+```
+
+Then modify the Python script to pass your `.hl` file like this:
+
+```python
+subprocess.run(['python', temp_file, '--file', 'example.hl'], check=True)
+```
+
+Or run it manually after download:
+
+```bash
+python Hinglish.py --file example.hl
+```
+
+---
+
+## 📁 Hinglish Syntax Examples
+
+```hl
+# Conditional (agar)
+agar true
+# Output: Condition met!
+
+agar false
+# Output: Condition not met.
+
+# Loop (ghoom)
+ghoom 5
+# Output: Loop iteration. (x5)
+
+# Variable-like identifier
+meraNaam
+# Output: Variable: meraNaam
+```
+
+---
+
+## 🌐 CDN Used
+
+[Hinglish Interpreter Python File](https://pjdeveloper896.github.io/Hinglish-language/dist/Hinglish.py)
+
+---
+
+## 🧠 Author
+
+Created by [@pjdeveloper896](https://github.com/pjdeveloper896)
+
+---
