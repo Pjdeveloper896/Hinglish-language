@@ -1,194 +1,128 @@
-# Hinglish Programming Language (Stable)
 
-Welcome to the official documentation for the **Hinglish Programming Language** – a beginner-friendly, Hindi-English hybrid language designed for intuitive coding.
-
-## CDN Link
-Include this in your HTML file:
-```html
-<script src="https://pjdeveloper896.github.io/Hinglish-language/hinglish.min.js"></script>
-```
 
 ---
 
-## 1. Basic Setup
+
+# 💥 Hinglish Programming Language Runtime: Code Ka Tadka
+
+Welcome to Hinglish — the ultimate blend of Hindi and English, making programming fun, intuitive, and a little bit desi! Say goodbye to boring syntax and hello to a language that feels like home.
+
+---
+
+## 🚀 CDN Usage
+
+Add Hinglish magic to your project with this simple script tag:
+
+```
+<script src="https://pjdeveloper896.github.io/Hinglish-language/dist/hinglish.js"></script>
+```
+
+That's it! No need for complicated setups. Your Hinglish code is ready to rock and roll.
+
+---
+
+## 💡 API Reference: Get Ready to Break the Code Barrier
+
+Here’s how Hinglish helps you code with style:
+
+### 🔹 Hinglish Core
+
+| Command                                | Description                                        |
+| -------------------------------------- | -------------------------------------------------- |
+| `hinglish.likho(cheez)`                | Print something out loud, or well, to the console  |
+| `hinglish.banao(naam, value)`          | Declare a variable. No complex syntax, just banao! |
+| `hinglish.badlo(naam, value)`          | Update your variable and watch it transform.       |
+| `hinglish.lelo(naam)`                  | Grab the current value of any variable.            |
+| `hinglish.agar(shart, haanFn, nahiFn)` | If condition, but Hinglish style.                  |
+| `hinglish.ghoom(start, end, step, fn)` | Loop it up, Hinglish-style!                        |
+
+### 🔹 DOM Functions: Add, Change, and Remove in Style
+
+Use `dom` to make your webpage feel alive:
+
+| Command                              | Description                                 |
+| ------------------------------------ | ------------------------------------------- |
+| `dom.addKaro(innerHTML, tag, id?)`   | Add elements — the Hinglish way!            |
+| `dom.likhoInner(selector, text)`     | Change the inner content of an element.     |
+| `dom.setAttr(selector, attr, value)` | Set attributes like a boss.                 |
+| `dom.getAttr(selector, attr)`        | Retrieve an element’s attribute.            |
+| `dom.hatao(selector)`                | Remove the element like it was never there. |
+
+### 🔹 Events: Let’s Interact
+
+Your web page needs some action, right? Well, events got you covered:
+
+| Command                                 | Description                              |
+| --------------------------------------- | ---------------------------------------- |
+| `events.lagaEvent(selector, event, fn)` | Attach an event to a single element      |
+| `events.lagaSabko(selector, event, fn)` | Attach an event to all matching elements |
+
+---
+
+## ✨ Example: The Desi Counter App
+
+Here’s a cool example that counts your clicks and prints the result in Hinglish:
+
+### 💻 Full HTML Example
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Hinglish App</title>
-  <script src="https://pjdeveloper896.github.io/Hinglish-language/hinglish.min.js"></script>
+  <meta charset="UTF-8">
+  <title>Hinglish Counter Example</title>
 </head>
 <body>
-  <button id="btn1">Click Me</button>
-  <script type="text/hinglish">
-    likho "Hinglish loaded!"
 
-    jabKaro "click" ₹ "btn1" {
-      likho "Button dabaya"
-      badloText "btn1" "Dubaara mat dabao"
-    }
+  <button id="gintiBtn">Ginti Badhao</button>
+  <div id="gintiValue">Ginti: 0</div>
+
+  <script src="https://yourusername.github.io/hinglish-runtime/hinglish.js"></script>
+
+  <script>
+    hinglish.banao("ginti", 0);
+
+    events.lagaEvent("#gintiBtn", "click", () => {
+      const abhi = hinglish.lelo("ginti");
+      hinglish.badlo("ginti", abhi + 1);
+      dom.likhoInner("#gintiValue", "Ginti: " + hinglish.lelo("ginti"));
+    });
   </script>
+
 </body>
 </html>
 ```
 
+### What’s Happening Here:
+
+1. We declared a variable called `ginti` (that’s "count" in Hinglish).
+2. When the button is clicked, `ginti` is incremented, and the result is updated in the `gintiValue` div.
+3. It's simple, it's easy, and it’s *very Hinglish*.
+
 ---
 
-## 2. Syntax Reference
-```hinglish
-likho "Hello world"
-banao naam = "Amit"
-badlo "btn1" background-color "red"
-badloText "btn1" "Naya text"
+## 💥 Why Hinglish?
+
+* **User-Friendly**: Feel at home while coding, with a syntax that’s a mix of Hindi and English.
+* **Quick Setup**: Drop in the CDN and start coding, no extra configurations needed.
+* **Flexible & Powerful**: Whether you're making a small project or a big app, Hinglish gives you full control without the unnecessary complexity.
+
+---
+
+## 🛠️ Contribute: Let's Make Hinglish Even Better!
+
+Hinglish is always evolving, and you can be a part of its growth! Whether you're fixing bugs, adding new features, or creating localized commands, your contribution will make Hinglish even better. Fork the repo, make your magic happen, and send a PR!
+
+---
+
+Got questions, feedback, or an idea for a new command? [Open an issue](https://pjdeveloper896.github.io/Hinglish-language/issues) or just drop us a line.
+
+---
+
+Let’s code like never before, with Hinglish! 🚀
+
 ```
 
 ---
 
-## 3. Event Listeners
-### Direct:
-```hinglish
-jabKaro "click" ₹ "btn1" {
-  likho "Click hua"
-}
 ```
-### Delegated:
-```hinglish
-jabKaro "click" ₹@"dynamicBtn" {
-  likho "Dynamic button dabaya"
-}
-```
-
----
-
-## 4. Conditional
-```hinglish
-agar (x > 5) {
-  likho "Bada hai"
-} warna {
-  likho "Chhota ya barabar hai"
-}
-```
-
----
-
-## 5. Loop
-```hinglish
-loopKaro(i = 0; i < 5; i++) {
-  likho i
-}
-```
-
----
-
-## 6. Functions
-```hinglish
-kaam greet(naam) {
-  likho "Hello " + naam
-}
-
-greet("Amit")
-```
-
----
-
-## 7. Classes and Objects
-```hinglish
-class Aadmi {
-  constructor() {
-    this.naam = "Hero"
-    likho "Ek aadmi bana"
-  }
-
-  kaam bol() {
-    likho this.naam + " bol raha hai"
-  }
-}
-
-banao insaan = new Aadmi()
-insaan.bol()
-```
-
----
-
-## 8. Arrays and Objects
-```hinglish
-banao fruits = ["seb", "kela", "aam"]
-likho fruits[1]
-
-banao aadmi = {
-  naam: "Ravi",
-  umr: 25
-}
-
-likho aadmi.naam
-```
-
----
-
-## 9. Import External Hinglish File
-```hinglish
-import "https://example.com/mera-code.hl"
-```
-
----
-
-## 10. Fetch API with Async/Await
-```hinglish
-kaam loData() {
-  banao data = await fetchKaro("https://jsonplaceholder.typicode.com/todos/1")
-  likho data.title
-}
-
-loData()
-```
-
----
-
-## 11. AI App Generation
-```hinglish
-banao app "todo list"
-```
-
----
-
-## Deployment Tips
-- Wrap Hinglish code inside `<script type="text/hinglish">`.
-- Code runs automatically after `DOMContentLoaded`.
-- Interpreter supports full JS-like behavior: variables, classes, arrays, async/await, DOM, AI, and more.
-
----
-
-## FAQ
-
-**Q: Do I need to run any JS manually?**  
-A: No, the Hinglish interpreter auto-executes your code after the DOM is ready.
-
-**Q: Can I use Hinglish with frameworks like React or Vue?**  
-A: Hinglish is best suited for vanilla HTML/JS projects.
-
-**Q: Can I contribute?**  
-A: Yes! Fork the repo and submit a PR with your improvements.
-
----
-
-## Changelog
-
-**v1.0.0**  
-- Initial public release with full feature support
-- Stable CDN
-- AI app generation feature
-
----
-
-## Troubleshooting
-
-**Problem:** Hinglish code doesn't run.  
-**Solution:** Ensure `<script src=".../hinglish.min.js">` is included and your Hinglish code is inside `<script type="text/hinglish">`.
-
-**Problem:** Import doesn't work.  
-**Solution:** Make sure the external `.hl` file has CORS headers and is publicly accessible.
-
----
-
-**Made with love for developers who think in Hinglish.**
