@@ -1,66 +1,95 @@
-(function(global) {
-  const context = {
-    console,
-    document,
-    window,
-    fetch,
-    Math,
-    likho: (...args) => console.log(...args),
-    bolo: (...args) => {}, // parsed as var declarations
-    pakdo: (selector) => {
-      const el = document.querySelector(selector);
-      return {
-        textBadlo: (txt) => el && (el.textContent = txt),
-        rangBadlo: (rang) => el && (el.style.color = rang),
-        htmlBadlo: (html) => el && (el.innerHTML = html),
-        jabKaro: (event, callback) => el && el.addEventListener(event, callback),
-      };
-    }
-  };
+// hinglish.js
 
-  function transpileHinglish(code) {
-    return code
-      .replace(/bolo\s+([a-zA-Z0-9_]+)\s*=\s*(.*)/g, "let $1 = $2")
-      .replace(/likho\s*\((.*?)\)/g, "context.likho($1)")
-      .replace(/pakdo\s*\((.*?)\)/g, `context.pakdo($1)`)
-      .replace(/jabKaro/g, "jabKaro") // used inside pakdo return
-      .replace(/rangBadlo/g, "rangBadlo")
-      .replace(/textBadlo/g, "textBadlo")
-      .replace(/htmlBadlo/g, "htmlBadlo")
-      .replace(/\bbanao function\s+([a-zA-Z0-9_]+)\s*\((.*?)\)/g, "function $1($2)")
-      .replace(/\bagar\s*\((.*?)\)/g, "if ($1)")
-      .replace(/\bnahiTo\s*\(/g, "else if (")
-      .replace(/\bnahiTo\b/g, "else")
-      .replace(/\bjabTak\s*\((.*?)\)/g, "while ($1)")
-      .replace(/\bkeLiye\s*\((.*?)\)/g, "for ($1)")
-      .replace(/\bbreak karo\b/g, "break")
-      .replace(/\bcontinue karo\b/g, "continue")
-      .replace(/\bwapas bhejo\s+(.*)/g, "return $1")
-      .replace(/\basync function\b/g, "async function")
-      .replace(/\bawait\b/g, "await")
-      .replace(/\bbanao class\s+([a-zA-Z0-9_]+)/g, "class $1")
-      .replace(/\bconstructor\b/g, "constructor")
-      .replace(/\bthis\b/g, "this")
+class Hinglish {
+  constructor() {
+    this.variables = {};
   }
 
-  async function runHinglish(code) {
-    const jsCode = transpileHinglish(code);
-    const asyncFn = new Function("context", `"use strict"; return (async () => { ${jsCode} })()`);
+  likho(likh) {
+    console.log(likh);
+  }
 
-    try {
-      await asyncFn(context);
-    } catch (err) {
-      console.error("Hinglish Error:", err.message);
+  banao(naam, value) {
+    this.variables[naam] = value;
+  }
+
+  badlo(naam, nayaValue) {
+    if (naam in this.variables) {
+      this.variables[naam] = nayaValue;
+    } else {
+      console.error(`Variable '${naam}' pehle banao.`);
     }
   }
 
-  function initInterpreter() {
-    document.querySelectorAll('script[type="text/hinglish"]').forEach(async (script) => {
-      const code = script.innerText;
-      await runHinglish(code);
+  lelo(naam) {
+    return this.variables[naam];
+  }
+
+  agar(condition, haanKaro, nahiKaro = () => {}) {
+    if (condition) {
+      haanKaro();
+    } else {
+      nahiKaro();
+    }
+  }
+
+  ghoom(start, end, step = 1, callback) {
+    for (let i = start; i < end; i += step) {
+      callback(i);
+    }
+  }
+}
+
+class Dom {
+  addKaro(content, tag, id = "") {
+    const el = document.createElement(tag);
+    el.innerHTML = content;
+    if (id) el.id = id;
+    document.body.appendChild(el);
+  }
+
+  likhoInner(selector, text) {
+    const el = document.querySelector(selector);
+    if (el) el.innerHTML = text;
+  }
+
+  setAttr(selector, attr, value) {
+    const el = document.querySelector(selector);
+    if (el) el.setAttribute(attr, value);
+  }
+
+  getAttr(selector, attr) {
+    const el = document.querySelector(selector);
+    return el ? el.getAttribute(attr) : null;
+  }
+
+  hatao(selector) {
+    const el = document.querySelector(selector);
+    if (el) el.remove();
+  }
+
+  laoElement(selector) {
+    return document.querySelector(selector);
+  }
+}
+
+class Events {
+  lagaEvent(selector, eventType, callback) {
+    const el = document.querySelector(selector);
+    if (el) {
+      el.addEventListener(eventType, callback);
+    }
+  }
+
+  lagaSabko(selector, eventType, callback) {
+    document.addEventListener(eventType, (e) => {
+      if (e.target.matches(selector)) {
+        callback(e);
+      }
     });
   }
+}
 
-  window.addEventListener("DOMContentLoaded", initInterpreter);
-  global.runHinglish = runHinglish;
-})(window);
+window.hinglish = new Hinglish();
+window.dom = new Dom();
+window.events = new Events();
