@@ -264,3 +264,6 @@ meraNaam
 Created by [@pjdeveloper896](https://github.com/pjdeveloper896)
 
 ---
+### Learn more .
+ Learn hinglish  [tutorial](https://pjdeveloper896.github.io/Hinglish-language/Tutorial.md)
+ Learn about modules [modules](https://pjdeveloper896.github.io/Hinglish-language/module.md)
