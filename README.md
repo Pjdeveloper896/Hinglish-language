@@ -77,7 +77,7 @@ Here’s a cool example that counts your clicks and prints the result in Hinglis
   <button id="gintiBtn">Ginti Badhao</button>
   <div id="gintiValue">Ginti: 0</div>
 
-  <script src="https://yourusername.github.io/hinglish-runtime/hinglish.js"></script>
+  <script src="https://pjdeveloper896.github.io/Hinglish-language/dist/hinglish.js"></script>
 
   <script>
     hinglish.banao("ginti", 0);
