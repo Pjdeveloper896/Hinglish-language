@@ -1,4 +1,3 @@
-// hinglish.js
 
 class Hinglish {
   constructor() {
@@ -36,6 +35,57 @@ class Hinglish {
   ghoom(start, end, step = 1, callback) {
     for (let i = start; i < end; i += step) {
       callback(i);
+    }
+  }
+
+  // Arrays
+  jodoArray(naam, item) {
+    if (Array.isArray(this.variables[naam])) {
+      this.variables[naam].push(item);
+    } else {
+      console.error(`${naam} ek array nahi hai.`);
+    }
+  }
+
+  leloArrayKa(naam, index) {
+    if (Array.isArray(this.variables[naam])) {
+      return this.variables[naam][index];
+    }
+    console.error(`${naam} ek array nahi hai.`);
+    return null;
+  }
+
+  // Objects
+  setKaroObj(naam, key, value) {
+    if (typeof this.variables[naam] === 'object' && !Array.isArray(this.variables[naam])) {
+      this.variables[naam][key] = value;
+    } else {
+      console.error(`${naam} ek object nahi hai.`);
+    }
+  }
+
+  leloObjKa(naam, key) {
+    if (typeof this.variables[naam] === 'object' && !Array.isArray(this.variables[naam])) {
+      return this.variables[naam][key];
+    }
+    console.error(`${naam} ek object nahi hai.`);
+    return null;
+  }
+
+  // Functions
+  banaoFunction(naam, fn) {
+    if (typeof fn === 'function') {
+      this.variables[naam] = fn;
+    } else {
+      console.error(`Function ke liye ek valid function pass karo.`);
+    }
+  }
+
+  chalaoFunction(naam, ...args) {
+    if (typeof this.variables[naam] === 'function') {
+      return this.variables[naam](...args);
+    } else {
+      console.error(`${naam} koi function nahi hai.`);
     }
   }
 }
@@ -90,6 +140,17 @@ class Events {
   }
 }
 
-window.hinglish = new Hinglish();
-window.dom = new Dom();
-window.events = new Events();
+
+// ✅ Export a bundled runtime class
+class HinglishRuntime {
+  constructor() {
+    this.core = new Hinglish();
+    this.dom = new Dom();
+    this.events = new Events();
+    this.date = new DateHinglish();
+    this.math = new MathHinglish();
+  }
+}
+
+// ✅ Expose globally for CDN use
+window.HinglishRuntime = HinglishRuntime;
