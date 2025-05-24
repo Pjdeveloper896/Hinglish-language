@@ -1,0 +1,34 @@
+{
+  "datetime": {
+    "version": "1.0.0",
+    "url": "https://raw.githubusercontent.com/pjdeveloper896/hinglish-packages/main/datetime/main.hl"
+  },
+  "math": {
+    "version": "1.0.0",
+    "url": "https://raw.githubusercontent.com/pjdeveloper896/hinglish-packages/main/math/main.hl"
+  },
+  "random": {
+    "version": "1.0.0",
+    "url": "https://raw.githubusercontent.com/pjdeveloper896/hinglish-packages/main/random/main.hl"
+  },
+  "stringtools": {
+    "version": "1.0.0",
+    "url": "https://raw.githubusercontent.com/pjdeveloper896/hinglish-packages/main/stringtools/main.hl"
+  },
+  "timer": {
+    "version": "1.0.0",
+    "url": "https://raw.githubusercontent.com/pjdeveloper896/hinglish-packages/main/timer/main.hl"
+  },
+  "colors": {
+    "version": "1.0.0",
+    "url": "https://raw.githubusercontent.com/pjdeveloper896/hinglish-packages/main/colors/main.hl"
+  },
+  "fs": {
+    "version": "1.0.0",
+    "url": "https://raw.githubusercontent.com/pjdeveloper896/hinglish-packages/main/fs/main.hl"
+  },
+  "fetch": {
+    "version": "1.0.0",
+    "url": "https://raw.githubusercontent.com/pjdeveloper896/hinglish-packages/main/fetch/main.hl"
+  }
+}
